@@ -18,7 +18,8 @@ const useFontLoader = (families = ['Press Start 2P', 'Roboto', 'Chelsea Market']
         setFontLoaded(true);
       },
       inactive: () => {
-        console.error('Google Fonts failed to load.');
+        setFontLoaded(true);
+        // console.error('Google Fonts failed to load.');
       },
     });
   }, [families]);

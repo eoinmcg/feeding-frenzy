@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Point, UseInputReturn } from '../types';
 
-export default function useInput(): UseInputReturn {
+export default function useInput(multiTouchMode = false): UseInputReturn {
   const [mouseClick, setMouseClick] = useState<Point | null>(null);
   const [touchPosition, setTouchPosition] = useState<Point | null>(null);
   const [p1Touch, setP1Touch] = useState<Point | null>(null);
@@ -27,36 +27,32 @@ export default function useInput(): UseInputReturn {
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (e.changedTouches.length > 0) {
+
+      if (multiTouchMode && e.changedTouches.length > 0) {
         const canvasHeight = canvas.height;
         const midPoint = canvasHeight / 2;
-        
+
         let newP1Touch = null;
         let newP2Touch = null;
-        
+
         for (let i = 0; i < e.changedTouches.length; i++) {
           const touch = e.changedTouches[i];
           const normalizedPoint = normalize({ x: touch.clientX, y: touch.clientY });
-          
-          if (normalizedPoint.y <= midPoint) {
-            // Top half - Player 2 (take the last one if multiple touches in same area)
-            console.log('P2');
+
+          if (normalizedPoint.y < midPoint - 3) {
             newP2Touch = normalizedPoint;
-          } else {
-            // Bottom half - Player 1 (take the last one if multiple touches in same area)
-            console.log('P1');
+          } else if (normalizedPoint.y > midPoint + 3) {
             newP1Touch = normalizedPoint;
           }
         }
-        
         // Update the states
         setP1Touch(newP1Touch);
         setP2Touch(newP2Touch);
-        
-        if (e.touches.length > 0) {
-          setTouchPosition(normalize({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-        }
+      } else if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        setTouchPosition(normalize({ x: touch.clientX, y: touch.clientY }));
       }
+
     };
 
     window.addEventListener('mousedown', handleMouseDown);

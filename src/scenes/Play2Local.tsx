@@ -68,7 +68,7 @@ export default function Play2Local({textures, setScene, mute, plays}) {
       <pixiGraphics
         alpha={.25}
         draw={(g) => {
-          g.clear().rect(0, SIZE.h/2-4, SIZE.w, 8).fill('white');
+          g.clear().rect(0, SIZE.h/2-5, SIZE.w, 10).fill('white');
         }}
       />
 

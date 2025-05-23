@@ -9,8 +9,10 @@ export function Timer({ time }) {
       fontFamily: 'Chelsea Market',
       fontSize: 50,
       fontWeight: 'bold',
-      stroke: '#fff',
-      strokeThickness: 3,
+      stroke: {
+          color: '#fff',
+          width: 3
+      },
       fill: 0x000000,
   }
 

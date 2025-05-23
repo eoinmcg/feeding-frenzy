@@ -12,8 +12,10 @@ export function BigMessage(props) {
       fontFamily: 'Chelsea Market',
       fontSize: props.size || 60,
       fontWeight: 'bold',
-      stroke: '#fff',
-      strokeThickness: 3,
+      stroke: {
+          color: '#fff',
+          width: 3
+      },
       textAlign: 'center',
       fill: props.fill || 0xcc2200,
   }

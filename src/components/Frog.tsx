@@ -12,7 +12,7 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
 
   const { R, SPEED, SIZE } = useGameStore();
   const originalPos: Point = player.pos;
-  const { mouseClick, touchPosition, p1Touch, p2Touch } = useInput();
+  const { mouseClick, touchPosition, p1Touch, p2Touch } = useInput(mode === 'Play2Local' ? true : false);
 
   const [eyesClosed, setEyesClosed] = useState(0);
   const [mouth, setMouth] = useState('mouth_smile.png');
@@ -40,10 +40,10 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
   useEffect(() => {
     if (direction !== 0) return;
     if (p1Touch && mode == 'Play2Local' && player.name === 'p1') {
-      return handleInput({ x: p1Touch.x + R, y: p1Touch.y }, 100);
+      return handleInput({ x: p1Touch.x + R, y: p1Touch.y }, 150);
     }
     if (p2Touch && mode == 'Play2Local' && player.name === 'p2') {
-      return handleInput({ x: p2Touch.x + R, y: p2Touch.y }, 100);
+      return handleInput({ x: p2Touch.x + R, y: p2Touch.y }, 150);
     }
 
     if (mode === 'Play2Local') return;
@@ -68,7 +68,6 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
     if (!targetPos || direction === 0) return;
 
     const dest = direction === 1 ? targetPos : originalPos;
-    console.log(originalPos, targetPos, dest);
 
     const dx = dest.x - pos.x;
     const dy = dest.y - pos.y;
@@ -91,7 +90,6 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
         setScore(parseInt(score, 10) + (10 * combo.length));
         if (combo.length > 1) {
           setComboText(combo.length + 1);
-          console.log('COMBO', combo.length+1, color);
         }
         setCombo([]);
         setDirection(0);
@@ -174,7 +172,11 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
 
             g.moveTo(originalPos.x + w, originalPos.y)
               .lineTo(pos.x + w, pos.y)
-              .stroke({ color: w < 2 ? 'hotpink' : 0xff0000, pixelLine: true });
+              .stroke({ 
+                color: w < 2 ? 'hotpink' : 0xff0000, 
+                width: w < 2 ? 2 : 1, // Different widths for different parts
+                pixelLine: true 
+              });
           }
         }}
       />}

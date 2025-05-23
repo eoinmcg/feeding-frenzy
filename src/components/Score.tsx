@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { extend, useTick } from '@pixi/react';
+import { useTick } from '@pixi/react';
 import { Text } from 'pixi.js';
-extend({ Text });
 
 import { scoreSmall } from '../textStyles';
 

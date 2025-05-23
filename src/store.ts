@@ -14,11 +14,13 @@ export const useGameStore = create((set, get) => ({
   R: 10, // player tongue tip radius
   centerPos: { x: 120, y: 420 },
   P1: {
-    pos: {x: 40, y: 420},
+    name: 'p1',
+    pos: {x: 120, y: 420},
     colors: ['green', 'gold', 'orange']
   },
   P2: {
-    pos: {x: 225, y: 420},
+    name: 'p2',
+    pos: {x: 120, y: 60},
     colors: ['hotpink', 'darkorchid', 'indianred']
   },
   SIZE: { w: 270, h: 480 }, // canvas size
@@ -30,6 +32,7 @@ export const useGameStore = create((set, get) => ({
     brown: 0x4d2926,
     stone: 0x9D9D9D,
   },
+  DISGUISES: ['poop', 'flower'],
   // variables
   mute: getStorage('mute', false),
   hiScore: getStorage('hiScore', 50),

@@ -57,5 +57,24 @@ export const Helpers = {
   */
   clamp: function(val, min, max) {
     return Math.min(Math.max(val, min), max);
-  }
+  },
+
+
+  /**
+  * clamps number in range
+  * 
+  * @param {object} player
+  * @param {object} collides with Point
+  * @param {number} radius with Point
+  * @returns {boolean}
+  */
+  checkCollision: function(player, pos, RADIUS = 10) {
+  const collisionThresholdSquared = Math.pow(RADIUS + 6, 2);
+  const dx = player.pos.x - pos.x;
+  const dy = player.pos.y - pos.y;
+  const distSquared = dx * dx + dy * dy;
+
+  return distSquared <= collisionThresholdSquared;
+},
+
 };

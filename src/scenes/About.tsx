@@ -11,6 +11,12 @@ export default function About({ textures, setScene }) {
 
   const { SIZE } = useGameStore();
 
+  useEffect(() => {
+
+    console.log('BUILD', window.BUILD);
+    
+  });
+
   const backButtonCallback = () => { setScene('Splash'); }
 
   return (

@@ -4,39 +4,58 @@ import type { Point } from '../types';
 import useInput from '../hooks/useInput';
 
 import sfx from '../helpers/sfx';
-import { Helpers as H } from '../helpers/utils';
 import { useGameStore } from '../store';
 import { Combo } from './Combo';
 
 
-export function Frog({ textures, player, pos, setPos, direction, setDirection, targetPos, setTargetPos, combo, setCombo, score, setScore, gameOver, color }) {
+export function Frog({ textures, player, pos, setPos, direction, setDirection, targetPos, setTargetPos, combo, setCombo, score, setScore, gameOver, color, disguise, setDiguise, mode }) {
 
   const { R, SPEED, SIZE } = useGameStore();
   const originalPos: Point = player.pos;
-  const { mousePosition, mouseClick, touchPosition } = useInput();
+  const { mouseClick, touchPosition, p1Touch, p2Touch } = useInput();
 
   const [eyesClosed, setEyesClosed] = useState(0);
-  const [mouth, setMouth] = useState(3);
+  const [mouth, setMouth] = useState('mouth_smile.png');
   const [comboText, setComboText] = useState(0);
+
+
+  useEffect(() => {
+    setPos(originalPos);
+  }, []);
 
   color = color || 'goldenrod';
 
+  // amplify allows 2 player touch to extend beyond the frog's
+  // half off the screen
+  const handleInput = (pos, amplify = 0) => {
+    sfx('swipe');
+    const finalPos = amplify > 0 
+      ? amplifyTargetPos(originalPos, pos, amplify) 
+      : pos;
+    setTargetPos(finalPos);
+    setDirection(1);
+    setEyesClosed(0);
+  }
+
   useEffect(() => {
+    if (direction !== 0) return;
+    if (p1Touch && mode == 'Play2Local' && player.name === 'p1') {
+      return handleInput({ x: p1Touch.x + R, y: p1Touch.y }, 100);
+    }
+    if (p2Touch && mode == 'Play2Local' && player.name === 'p2') {
+      return handleInput({ x: p2Touch.x + R, y: p2Touch.y }, 100);
+    }
+
+    if (mode === 'Play2Local') return;
+
     if (mouseClick && mouseClick.x <= SIZE.w) {
       if (targetPos !== null || mouseClick.y > 450) return;
-      sfx('swipe');
-      const p = { x: mouseClick.x + R, y: mouseClick.y };
-      setTargetPos(p);
-      setDirection(1);
-      setEyesClosed(0);
+      return handleInput({ x: mouseClick.x + R, y: mouseClick.y });
     }
-    if (touchPosition) {
-      const p = { x: touchPosition.x + R, y: touchPosition.y };
-      setTargetPos(p);
-      setDirection(1);
-      setEyesClosed(0);
+    if (touchPosition && !mode) {
+      return handleInput({ x: touchPosition.x + R, y: touchPosition.y });
     }
-  }, [mouseClick, touchPosition]);
+  }, [mouseClick, touchPosition, p1Touch, p2Touch]);
 
   useTick((tick) => {
 
@@ -49,6 +68,7 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
     if (!targetPos || direction === 0) return;
 
     const dest = direction === 1 ? targetPos : originalPos;
+    console.log(originalPos, targetPos, dest);
 
     const dx = dest.x - pos.x;
     const dy = dest.y - pos.y;
@@ -64,13 +84,14 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
         if (combo.length) {
           sfx('collect');
           setEyesClosed(window.performance.now());
-          setMouth(2);
+          setMouth('mouth_smile.png');
         } else {
-          setMouth(3);
+          setMouth('mouth_sad.png');
         }
         setScore(parseInt(score, 10) + (10 * combo.length));
         if (combo.length > 1) {
-          setComboText(combo.length);
+          setComboText(combo.length + 1);
+          console.log('COMBO', combo.length+1, color);
         }
         setCombo([]);
         setDirection(0);
@@ -88,16 +109,29 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
 
   return (
     <>
+      <pixiContainer>
+      {disguise === 'poop' && <pixiSprite
+          anchor={0.5}
+          texture={textures['poop.png']}
+          x={originalPos.x}
+          y={originalPos.y - 32} />
+      }
+      {disguise === 'flower' && <pixiSprite
+          anchor={0.5}
+          texture={textures['flower.png']}
+          x={originalPos.x}
+          y={originalPos.y - 32} />
+      }
       <pixiSprite
           tint={color}
           anchor={0.5}
-          texture={textures[0]}
+          texture={textures['frog_bw.png']}
           x={originalPos.x}
           y={originalPos.y} />
       <pixiSprite
           alpha={0.75}
           anchor={0.5}
-          texture={textures[1]}
+          texture={textures['frog_belly.png']}
           x={originalPos.x}
           y={originalPos.y} />
       {/* mouth */}
@@ -156,6 +190,32 @@ export function Frog({ textures, player, pos, setPos, direction, setDirection, t
         }}
       />}
       <Combo defaultColor={color} text={comboText} pos={originalPos} reset={setComboText} />
+      </pixiContainer>
     </>
   );
 }
+
+const amplifyTargetPos = (originalPos, targetPos, amplificationPixels) => {
+  // Calculate the direction vector
+  const dx = targetPos.x - originalPos.x;
+  const dy = targetPos.y - originalPos.y;
+  
+  // Calculate the current distance
+  const currentDistance = Math.sqrt(dx * dx + dy * dy);
+  
+  // Avoid division by zero
+  if (currentDistance === 0) return targetPos;
+  
+  // Calculate the unit vector (normalized direction)
+  const unitX = dx / currentDistance;
+  const unitY = dy / currentDistance;
+  
+  // Calculate the new distance
+  const newDistance = currentDistance + amplificationPixels;
+  
+  // Return the amplified position
+  return {
+    x: originalPos.x + (unitX * newDistance),
+    y: originalPos.y + (unitY * newDistance)
+  };
+};

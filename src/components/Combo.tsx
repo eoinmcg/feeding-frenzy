@@ -1,61 +1,89 @@
-import { useEffect,  useState } from 'react';
-import { extend, useTick } from '@pixi/react';
-import { Text } from 'pixi.js';
-extend({ Text });
-
+import { useEffect, useState, useMemo } from 'react';
+import { useTick } from '@pixi/react';
 import { comboSmall, comboLarge } from '../textStyles';
-import sfx from '../helpers/sfx';
 
-export function Combo({defaultColor, text, pos, reset}) {
-
-  const [offset, setOffset] = useState(0);
-  const [opacity, setOpacity] = useState(1);
-  const [color, setColor] = useState(defaultColor);
-  const [textSmall, setTextSmall] = useState();
-  const [textLarge, setTextLarge] = useState();
-
-  useEffect(() => {
-    setOffset(0);
-    setOpacity(1);
-    comboSmall.fill = color;
-    comboLarge.fill = color;
-
-    setTextSmall(new Text(comboSmall));
-    setTextLarge(new Text(comboLarge));
-
-
-  }, [text]);
-
-  useTick((tick) => {
-    setOffset(offset - tick.deltaTime / 1.2);
-    setOpacity(opacity - tick.deltaTime / 100);
-    if (opacity < 0) {
-      reset(0);
-    }
+export function Combo({ defaultColor, text, pos, reset }) {
+  const [animationState, setAnimationState] = useState({
+    offset: 0,
+    opacity: 1,
+    isActive: false,
+    currentText: 0
   });
 
-  if (!text) return (<></>);
+  const smallStyle = useMemo(() => ({
+    ...comboSmall,
+    fill: defaultColor
+  }), [defaultColor]);
+
+  const largeStyle = useMemo(() => ({
+    ...comboLarge,
+    fill: defaultColor
+  }), [defaultColor]);
+
+  // Reset animation when text changes and is greater than 0
+  useEffect(() => {
+    if (text > 0 && text !== animationState.currentText) {
+      setAnimationState({
+        offset: 0,
+        opacity: 1,
+        isActive: true,
+        currentText: text
+      });
+    }
+  }, [text, defaultColor, animationState.currentText]);
+
+  useTick((tick) => {
+    if (!animationState.isActive) return;
+
+    const deltaTime = tick.deltaTime;
+    
+    setAnimationState(prev => {
+      const newOffset = prev.offset - deltaTime / 1.2;
+      const newOpacity = prev.opacity - deltaTime / 100;
+      
+      // Reset when animation is complete
+      if (newOpacity <= 0) {
+        // Use setTimeout to avoid calling reset during render
+        setTimeout(() => reset(0), 0);
+        return {
+          ...prev,
+          isActive: false,
+          opacity: 0,
+          offset: newOffset
+        };
+      }
+      
+      return {
+        ...prev,
+        offset: newOffset,
+        opacity: newOpacity
+      };
+    });
+  });
+
+  // Don't render if not active or no text
+  if (!animationState.isActive || !text || text <= 0) {
+    return null;
+  }
 
   return (
     <>
       <pixiText
-        angle={opacity * 5}
-        alpha={opacity}
-        x={pos.x - 35} y={pos.y - 80 + offset}
+        angle={animationState.opacity * 5}
+        alpha={Math.max(0, animationState.opacity)}
+        x={pos.x - 35} 
+        y={pos.y - 80 + animationState.offset}
         text="COMBO"
-        style={textSmall}
-        />
-
+        style={smallStyle}
+      />
       <pixiText
-        angle={opacity * -5}
-        alpha={opacity}
-        x={pos.x - 9} y={pos.y - 60 + offset}
-        text={text}
-        style={textLarge}
-        />
-      </>
-
+        angle={animationState.opacity * -5}
+        alpha={Math.max(0, animationState.opacity)}
+        x={pos.x - 9} 
+        y={pos.y - 60 + animationState.offset}
+        text={animationState.currentText.toString()}
+        style={largeStyle}
+      />
+    </>
   );
-
 }
-

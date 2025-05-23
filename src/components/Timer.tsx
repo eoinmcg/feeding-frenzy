@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { extend, useTick } from '@pixi/react';
 import { Text } from 'pixi.js';
-extend({ Text });
 
 export function Timer({ time }) {
 
@@ -13,7 +11,7 @@ export function Timer({ time }) {
       fontWeight: 'bold',
       stroke: '#fff',
       strokeThickness: 3,
-      fill: 0x000000, // Green
+      fill: 0x000000,
   }
 
   useEffect(() => {

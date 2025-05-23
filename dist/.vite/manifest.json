@@ -1,0 +1,72 @@
+{
+  "_SharedSystems.js": {
+    "file": "assets/SharedSystems.js",
+    "name": "SharedSystems",
+    "imports": [
+      "index.html",
+      "_colorToUniform.js"
+    ]
+  },
+  "_colorToUniform.js": {
+    "file": "assets/colorToUniform.js",
+    "name": "colorToUniform"
+  },
+  "index.html": {
+    "file": "assets/index.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "dynamicImports": [
+      "node_modules/pixi.js/lib/environment-browser/browserAll.mjs",
+      "node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs",
+      "node_modules/pixi.js/lib/rendering/renderers/gpu/WebGPURenderer.mjs",
+      "node_modules/pixi.js/lib/rendering/renderers/gl/WebGLRenderer.mjs"
+    ],
+    "css": [
+      "assets/index.css"
+    ]
+  },
+  "node_modules/pixi.js/lib/environment-browser/browserAll.mjs": {
+    "file": "assets/browserAll.js",
+    "name": "browserAll",
+    "src": "node_modules/pixi.js/lib/environment-browser/browserAll.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs",
+      "_colorToUniform.js"
+    ]
+  },
+  "node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs": {
+    "file": "assets/webworkerAll.js",
+    "name": "webworkerAll",
+    "src": "node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_colorToUniform.js"
+    ]
+  },
+  "node_modules/pixi.js/lib/rendering/renderers/gl/WebGLRenderer.mjs": {
+    "file": "assets/WebGLRenderer.js",
+    "name": "WebGLRenderer",
+    "src": "node_modules/pixi.js/lib/rendering/renderers/gl/WebGLRenderer.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_colorToUniform.js",
+      "_SharedSystems.js"
+    ]
+  },
+  "node_modules/pixi.js/lib/rendering/renderers/gpu/WebGPURenderer.mjs": {
+    "file": "assets/WebGPURenderer.js",
+    "name": "WebGPURenderer",
+    "src": "node_modules/pixi.js/lib/rendering/renderers/gpu/WebGPURenderer.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_colorToUniform.js",
+      "_SharedSystems.js"
+    ]
+  }
+}

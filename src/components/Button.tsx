@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { extend } from '@pixi/react';
+import { useState, useEffect } from 'react';
 import { Text } from 'pixi.js';
-extend({ Text });
 
 import { useGameStore } from '../store';
 import { buttonLarge } from '../textStyles';
@@ -12,7 +10,10 @@ export function Button(props) {
   const { SIZE } = useGameStore();
 
   const [bgColor, setBgColor] = useState(props.color);
-  const textStyle = new Text(buttonLarge);
+  const [textStyle, setTextStyle] = useState();
+  useEffect(() => {
+    setTextStyle(buttonLarge)
+  }, []);
 
   return (
     <>
@@ -42,7 +43,7 @@ export function Button(props) {
       />
       <pixiText
         text={props.text}
-        x={30} y={5}
+        x={30+(props.xPos || 0)} y={5}
         style={textStyle}
         />
     </pixiContainer>
